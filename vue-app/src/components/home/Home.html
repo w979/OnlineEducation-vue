@@ -1,0 +1,77 @@
+<el-container>
+  <!--头部开始-->
+  <el-header>
+    <el-row>
+      <el-col :span="6"><img src="../../assets/logo1.png"></el-col>
+      <el-col :span="17">
+        <div style="margin-top: -15px">
+          <span style="margin-left: 815px;font-size:8px">欢迎您:
+            <span style="font-size: 16px;color:palevioletred;">{{username}}</span></span>
+        </div>
+      </el-col>
+      <el-col :span="1">
+        <el-dropdown>
+          <div class="block" style="padding-top: 8px;margin-left: 10px">
+            <el-avatar :size="48">
+              <img v-if="username=='admin'" src="../../assets/dt.gif"/>
+              <img v-if="username!='admin'" src="../../assets/dt.gif"/>
+            </el-avatar>
+          </div>
+          <div style="margin-bottom: -30px">
+            <el-dropdown-menu slot="dropdown" trigger="click">
+              <el-dropdown-item>
+                <span type="danger"  @click="goHome"><span class="el-icon-house"></span> &nbsp;系统首页</span>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <span type="danger" @click="btnMe"><span class="el-icon-ship"></span> &nbsp;个人中心</span>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <span type="danger" @click="logout"><span class="el-icon-switch-button"></span> &nbsp;安全登出</span>
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </div>
+        </el-dropdown>
+      </el-col>
+    </el-row>
+  </el-header>
+  <!-- 头部结束 -->
+
+  <el-container>
+    <!-- 左侧导航开始
+     router=true:是否开启路由模式，开启后会将导航的index属性中的值做为url的跳转
+     -->
+    <el-aside width="200px">
+      <el-menu
+        default-active="1"
+        class="el-menu-vertical-demo"
+        background-color="#F1F3F4"
+        text-color="black"
+        router="router"
+        active-text-color="#ffd04b">
+        <el-submenu :index="firstmenu.id+''" v-for="(firstmenu) in menuitem" :key="firstmenu.id+''">
+          <template slot="title">
+            <i v-bind:class="firstmenu.icon"></i>
+            <span>{{firstmenu.name}}</span>
+          </template>
+          <el-menu-item-group>
+            <el-menu-item :index="childrenmenu.link+''" v-for="(childrenmenu) in firstmenu.childrensList" :key="childrenmenu.id+''">
+              {{childrenmenu.name}}
+            </el-menu-item>
+          </el-menu-item-group>
+        </el-submenu>
+
+      </el-menu>
+    </el-aside>
+    <!-- 左侧导航结束 -->
+
+
+    <!-- 右侧动态内容区开始 -->
+    <el-main>
+      <div>
+        <router-view/>
+      </div>
+    </el-main>
+    <!-- 右侧动态内容区结束 -->
+
+  </el-container>
+</el-container>

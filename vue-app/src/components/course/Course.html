@@ -1,0 +1,207 @@
+<div>
+  <!--导航-->
+  <div>
+    <el-breadcrumb separator-class="el-icon-arrow-right">
+      <el-breadcrumb-item :to="{ path: '/Home' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item>课程管理</el-breadcrumb-item>
+      <el-breadcrumb-item>课程列表</el-breadcrumb-item>
+    </el-breadcrumb>
+  </div>
+  <br/>
+
+ <div  align="left">
+   <!--搜索框-->
+   <el-select v-model="status" filterable="filterable" @change="selectQuery" placeholder="请选择">
+     <el-option
+       v-for="item in courseStatus"
+       :key="item.value"
+       :label="item.label"
+       :value="item.value">
+     </el-option>
+   </el-select>
+   &nbsp;&nbsp;
+   <!--添加按钮-->
+   <el-button type="primary" plain  @click="showAdd">增加课程信息</el-button>
+ </div>
+  <br/>
+  <!-- 数据表格开始 -->
+  <el-row>
+    <el-col :span="24">
+      <el-table
+        :data="tableData"
+        stripe="stripe"
+        fit="fit"
+        highlight-current-row="highlight-current-row"
+        border
+        style="width: 100%">
+        <el-table-column  align="center" prop="id" label="编号" width="50"></el-table-column>
+        <el-table-column  align="center" prop="subject.name" class="el-icon-circle-plus-outline" label="课程名称"></el-table-column>
+        <el-table-column  align="center" prop="describes" label="课程简介" width="180"></el-table-column>
+        <el-table-column  align="center" prop="teacher.name" label="教师" ></el-table-column>
+        <el-table-column  align="center" prop="electivedate" label="开选时间"></el-table-column>
+        <el-table-column  align="center" prop="pnum" label="课程容量" ></el-table-column>
+        <el-table-column  align="center" prop="status" label="课程状态" >
+          <template scope="scope">
+            <el-tag v-if="scope.row.status=='y'" type="success" effect="dark">可选</el-tag>
+            <el-tag v-if="scope.row.status=='n'"  type="danger" effect="dark">不可选</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column  align="center" prop="address" label="操作" width="150">
+          <template scope="scope">
+            <el-button type="primary"  icon="el-icon-edit" @click="showUpdate(scope.row,scope.row.subject.id,scope.row.teacher.id)"></el-button>
+            <el-button type="danger"  icon="el-icon-delete" @click="delCourse(scope.row.id,scope.$index)"></el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-col>
+  </el-row>
+  <!--数据表格结束-->
+  <div align="center">
+    <!-- 分页开始 -->
+    <el-pagination
+      style="margin-top:10px;"
+      background
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="this.pageNum"
+      :page-sizes="[5, 10, 15, 20]"
+      :page-size="this.pageSize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total"
+    ></el-pagination>
+  </div>
+  <!-- 分页结束 -->
+
+  <!--添加对话框-->
+  <el-dialog title="添加选课信息" :visible.sync="dialogFormVisible">
+    <el-form :model="addform" ref="addform" status-icon :rules="rules">
+
+      <el-form-item label="课程名称" :label-width="formLabelWidth" prop="subjectid">
+        <div style="margin-right: 250px">
+          <el-select v-model="addform.subjectid" placeholder="请选择">
+            <el-option
+              v-for="item in subjectItem"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </div>
+      </el-form-item>
+
+      <el-form-item label="讲师" :label-width="formLabelWidth" prop="teacherid">
+        <div style="margin-right: 250px">
+          <el-select v-model="addform.teacherid" placeholder="请选择">
+            <el-option
+              v-for="item in teacherItem"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </div>
+      </el-form-item>
+
+      <el-form-item label="课程简介" :label-width="formLabelWidth" prop="describes">
+        <div style="margin-left: 20px">
+          <el-input type="textarea" :rows="2" v-model="addform.describes" placeholder="请输入内容" autocomplete="off"></el-input>
+        </div>
+      </el-form-item>
+
+      <el-form-item label="开选时间" :label-width="formLabelWidth" prop="electivedate">
+        <div style="margin-right: 260px">
+        <el-date-picker
+          v-model="addform.electivedate"
+          type="datetime"
+          placeholder="选择日期">
+        </el-date-picker>
+        </div>
+      </el-form-item>
+
+      <el-form-item label="课程容量" :label-width="formLabelWidth" prop="pnum">
+        <div style="margin-right: 300px">
+          <el-input-number v-model="addform.pnum" :min="0" :max="300" autocomplete="off"></el-input-number>
+        </div>
+      </el-form-item>
+
+    </el-form>
+    <div slot="footer" class="dialog-footer">
+      <el-button @click="adddialogFormVisible('addform')">取 消</el-button>
+      <el-button type="primary" @click="addCourse('addform')">确 定</el-button>
+    </div>
+  </el-dialog>
+  <!--添加对话框结束-->
+
+  <!--修改对话框开始-->
+  <el-dialog title="修改选课信息" :visible.sync="UpdialogFormVisible">
+    <el-form :model="currentCourse" ref="updateform" status-icon :rules="rules">
+      <el-form-item label="课程名称" :label-width="formLabelWidth" prop="subjectid">
+        <div style="margin-right: 250px">
+          <el-select disabled v-model="currentCourse.subjectid" placeholder="请选择">
+            <el-option
+              v-for="item in subjectItem"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </div>
+      </el-form-item>
+
+      <el-form-item label="讲师" :label-width="formLabelWidth" prop="teacherid">
+        <div style="margin-right: 250px">
+          <el-select v-model="currentCourse.teacherid" placeholder="请选择">
+            <el-option
+              v-for="item in teacherItem"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </div>
+      </el-form-item>
+
+      <el-form-item label="课程简介" :label-width="formLabelWidth" prop="describes">
+        <div style="margin-left: 20px">
+          <el-input type="textarea" :rows="2" v-model="currentCourse.describes" placeholder="请输入内容" autocomplete="off"></el-input>
+        </div>
+
+      </el-form-item>
+
+      <el-form-item label="开选时间" :label-width="formLabelWidth" prop="electivedate">
+        <div style="margin-right: 260px">
+          <el-date-picker
+            v-model="currentCourse.electivedate"
+            type="datetime"
+            placeholder="选择日期">
+          </el-date-picker>
+        </div>
+      </el-form-item>
+
+      <el-form-item label="可选人数" :label-width="formLabelWidth" prop="pnum">
+        <div style="margin-right: 300px">
+          <el-input-number v-model="currentCourse.pnum" :min="0" :max="150" autocomplete="off"></el-input-number>
+        </div>
+      </el-form-item>
+
+      <el-form-item label="选课状态" :label-width="formLabelWidth" prop="status">
+        <div style="margin-right: 300px;margin-top: 8px">
+          <el-switch
+            style="display: block"
+            v-model="currentCourse.status"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            active-value="y"
+            active-text="可选"
+            inactive-value="n"
+            inactive-text="不可选">
+          </el-switch>
+        </div>
+      </el-form-item>
+    </el-form>
+    <div slot="footer" class="dialog-footer">
+      <el-button @click="updateDialogConcel('updateform')">取 消</el-button>
+      <el-button type="primary" @click="updateCourse('updateform')">确 定</el-button>
+    </div>
+  </el-dialog>
+  <!--修改对话框结束-->
+
+</div>
+
+

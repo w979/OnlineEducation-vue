@@ -1,0 +1,47 @@
+<div>
+<el-table
+  :data="tableData.filter(data => !search || data.name.toLowerCase().includes(search.toLowerCase()))"
+  style="width: 100%">
+  <el-table-column label="编号" prop="id" width="100"></el-table-column>
+  <el-table-column label="操作人" prop="name"></el-table-column>
+  <el-table-column label="操作地址" prop="ip"></el-table-column>
+  <el-table-column label="操作时间" prop="operatedate" width="200"></el-table-column>
+  <el-table-column label="行为" prop="msg"></el-table-column>
+  <el-table-column label="操作结果" prop="status">
+    <template scope="scope">
+      <el-tag v-if="scope.row.status=='y'" type="success">成功</el-tag>
+      <el-tag v-if="scope.row.status=='n'" type="danger">失败</el-tag>
+    </template>
+  </el-table-column>
+  <el-table-column
+    align="right">
+    <template slot="header" slot-scope="scope">
+      <el-input
+        v-model="search"
+        size="mini"
+        placeholder="输入操作人搜索"/>
+    </template>
+    <template slot-scope="scope">
+      <el-button
+        size="mini"
+        type="danger"
+        @click="delDetail(scope.$index, scope.row)">Delete</el-button>
+    </template>
+  </el-table-column>
+</el-table>
+  <div align="center">
+    <!-- 分页开始 -->
+    <el-pagination
+      style="margin-top:10px;"
+      background
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="this.pageNum"
+      :page-sizes="[7, 10, 15, 20]"
+      :page-size="this.pageSize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total"
+    ></el-pagination>
+  </div>
+  <!-- 分页结束 -->
+</div>

@@ -1,0 +1,58 @@
+<div class="ele" id="login">
+  <el-form ref="userFrom" method="post" status-icon :rules="rules" :model="users">
+    <div>
+      <img height="50" src="../../assets/logo1.png">
+    </div>
+    <div style="padding-top: 50px">
+      <h1 align="center"></h1>
+      <div>
+        <div style="display: flex;justify-content: center;padding-bottom: 50px;">
+          <el-card style="width: 400px;background-color: rgba(255, 255, 255, 0.7);">
+            <div slot="header" class="clearfix" align="center">
+              <span style="font-size: 20px">账号登录</span>
+            </div>
+            <table>
+              <tr>
+                <td><span style="padding-bottom: 20px" class="el-icon-user-solid"></span></td>
+                <td>
+                  <el-form-item prop="username">
+                  <el-input v-model="users.username" type="text" placeholder="请输入用户名"></el-input>
+                  </el-form-item>
+                </td>
+              </tr>
+
+              <tr>
+                <td><span style="padding-bottom: 20px" class="el-icon-view"></span></td>
+                <td>
+                  <el-form-item prop="password">
+                  <el-input type="password" v-model="users.password" placeholder="请输入密码"></el-input>
+                  </el-form-item>
+                </td>
+              </tr>
+
+              <tr>
+                <br/>
+                <td colspan="2">
+                  <span> <el-checkbox style="padding-bottom: 20px;" checked="checked">记住我</el-checkbox>
+
+                  <el-button style="margin-left: 220px" type="text" class="el-icon-refresh-left" @click="btnReset('userFrom')">重置</el-button></span>
+                  <el-button style="width: 340px" type="primary" @click="btnLogin('userFrom')">登录</el-button>
+                </td>
+              </tr>
+            </table>
+          </el-card>
+        </div>
+      </div>
+    </div>
+    <div>
+      <!-- 验证码 -->
+      <Vcode
+        :show="isShow"
+        @success="success"
+        :canvasWidth="400"
+        :canvasHeight="260"
+      />
+    </div>
+  </el-form>
+
+</div>
